@@ -1,6 +1,7 @@
 import { Alert, InputAccessoryView, Text, View } from 'react-native';
 import { Container, Logo, Input, Button, ButtonText, SignUpButton, SignUpText } from './styles';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { AuthContext } from '../../contexts/auth';
 
 
 
@@ -9,12 +10,22 @@ export default function SignIn() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const { signUp } = useContext(AuthContext)
 
   function handleLogin() {
     if(email === '' || password === '') {
       alert('Please fill out all fields.')
     }
     Alert.alert('Login!')
+  }
+
+  function handleSignUp () {
+    if(name === '' || email === '' || password == '') {
+      console.log('Fill out all fields')
+      return
+    }
+
+    signUp(email, password, name)
   }
 
   function toggleLogin() {
@@ -79,7 +90,7 @@ export default function SignIn() {
     onChangeText={(text) => setPassword(text)}
     />
 
-    <Button >
+    <Button onPress={() => handleSignUp()}>
       <ButtonText>SignUp</ButtonText>
     </Button>
 
