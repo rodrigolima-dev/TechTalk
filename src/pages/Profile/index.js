@@ -1,7 +1,18 @@
-import { View } from 'react-native';
+import { View, Button } from 'react-native';
+import { AuthContext } from '../../contexts/auth';
+import { useContext } from 'react';
 
 export default function Profile() {
- return (
-   <View/>
+  const { signOut } = useContext(AuthContext)
+
+  return(
+    <View>
+      <Button
+      title='Exit'
+      onPress={() => signOut()}
+      />
+    </View>
+
   );
+
 }

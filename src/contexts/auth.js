@@ -75,6 +75,14 @@ export default function AuthProvider({children}) {
         })
     }
 
+    async function signOut() {
+        await auth().signOut();
+        await AsyncStorage.clear()
+        .then(() => {
+            setUser(null)
+        })
+    }
+
     async function storageUser(data) {
         await AsyncStorage.setItem('devapp', JSON.stringify(data))
     }    
@@ -83,7 +91,7 @@ export default function AuthProvider({children}) {
 
     return(
         <AuthContext.Provider value={{signed: !!user, user, signIn, signUp, 
-        loadingAuth, loading}}>
+        loadingAuth, loading, signOut}}>
             {children}
         </AuthContext.Provider>
 
