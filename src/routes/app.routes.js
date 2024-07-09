@@ -10,6 +10,7 @@ import Search from "../pages/Search";
 import Profile from "../pages/Profile";
 import NewPost from "../pages/NewPost";
 import PostsUser from "../pages/PostsUser";
+import CancelButton from "../components/CancelButton";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -17,9 +18,27 @@ const Stack = createNativeStackNavigator();
 function StackScreen() {
     return(
         <Stack.Navigator>
-            <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
-            <Stack.Screen name="NewPost" component={NewPost} />
-            <Stack.Screen name="PostsUser" component={PostsUser} />
+            <Stack.Screen 
+            name="Home" 
+            component={Home} 
+            options={{headerShown: false}}/>
+
+            <Stack.Screen 
+            name="NewPost" 
+            component={NewPost} 
+            options={{
+                headerTintColor: '#fff',
+                headerStyle: {
+                    backgroundColor: '#36393f'
+                },
+                headerTitle: '',
+                headerLeft: () => <CancelButton/>
+            }}
+            />
+
+            <Stack.Screen 
+            name="PostsUser" 
+            component={PostsUser}/>
         </Stack.Navigator>
     );
 }
@@ -32,7 +51,8 @@ function AppRoutes() {
             tabBarShowLabel: false,
             tabBarStyle:{
                 backgroundColor: '#202225',
-                borderTopWidth: 0
+                borderTopWidth: .3,
+                borderTopColor: 'gray'
             },
             headerShown: false,
 
