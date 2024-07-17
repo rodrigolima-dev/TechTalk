@@ -29,7 +29,7 @@ function StackScreen() {
             options={{
                 headerTintColor: '#fff',
                 headerStyle: {
-                    backgroundColor: '#36393f'
+                    backgroundColor: '#202225',
                 },
                 headerTitle: '',
                 headerLeft: () => <CancelButton/>
@@ -38,7 +38,14 @@ function StackScreen() {
 
             <Stack.Screen 
             name="PostsUser" 
-            component={PostsUser}/>
+            component={PostsUser}
+            options={{
+                headerTintColor: '#fff',
+                headerStyle: {
+                    backgroundColor: '#202225'
+                }
+            }}
+            />
         </Stack.Navigator>
     );
 }
@@ -51,7 +58,7 @@ function AppRoutes() {
             tabBarShowLabel: false,
             tabBarStyle:{
                 backgroundColor: '#202225',
-                borderTopWidth: .3,
+                borderTopWidth: .5,
                 borderTopColor: 'gray'
             },
             headerShown: false,

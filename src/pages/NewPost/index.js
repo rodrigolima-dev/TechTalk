@@ -1,5 +1,6 @@
 import { Alert, View } from 'react-native';
 import {Container, Button, ButtonText, Input} from './styles'
+import { ActivityIndicator } from 'react-native';
 
 import { useLayoutEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -9,12 +10,15 @@ import { useContext } from 'react';
 import storage from '@react-native-firebase/storage'
 import firestore from '@react-native-firebase/firestore'
 
+
 export default function NewPost() {
   const navigation = useNavigation();
+
   const [post, setPost] = useState();
   const { user } = useContext(AuthContext)
 
   async function handlePost() {
+
     if (post === '') {
       Alert.alert('Please fill in the field.')
       return;
@@ -27,6 +31,7 @@ export default function NewPost() {
       .getDownloadURL();
 
       avatarUrl = response;
+      
 
     } catch (error) {
       avatarUrl = null;
@@ -61,7 +66,7 @@ export default function NewPost() {
     const options = navigation.setOptions({
       headerRight: () => (
         <Button onPress={() => handlePost()}>
-          <ButtonText>Post</ButtonText>
+            <ButtonText>Post</ButtonText>
         </Button>
       )
     })
