@@ -1,18 +1,131 @@
-import { View, Button } from 'react-native';
 import { AuthContext } from '../../contexts/auth';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+
+import { Container, Name, UploadButton, UploadText, Avatar, Button, ButtonText,
+Email, ModalContainer, ButtonBack, Input} from './styles'
+
+import Header from '../../components/Header';
+import Feather from 'react-native-vector-icons/Feather'
+import firestore from '@react-native-firebase/firestore'
+
+import { ActivityIndicator, Alert, Modal } from 'react-native';
 
 export default function Profile() {
-  const { signOut } = useContext(AuthContext)
+  const { user, signOut, storageUser, setUser } = useContext(AuthContext)
+
+  const [open, setOpen] = useState(false)
+  const [url, setUrl] = useState(null)
+  const [name, setName] = useState(user?.name)
+  const [loading, setLoading] = useState(false)
+
+  async function update () {
+    setLoading(true)
+    if(name === '' || name === undefined) {
+      Alert.alert('fill in all fields')
+      setLoading(false)
+      return;
+    }
+
+    await firestore().collection('users')
+    .doc(user.uid)
+    .update({
+      name: name
+    })
+
+    //Search all posts by this user
+    const postDocs = await firestore().collection('posts')
+    .where('userId', '==', user.uid)
+    .get();
+
+    postDocs.forEach( async doc => {
+      await firestore().collection('posts').doc(doc.id)
+      .update({
+        autor: name
+      })
+    })
+
+    let data = {
+      uid: user.uid,
+      name: name,
+      email: user.email
+    }
+
+
+    storageUser(data)
+    setUser(data)
+    setLoading(false)
+    setOpen(false)
+  }
+
+
 
   return(
-    <View>
-      <Button
-      title='Exit'
-      onPress={() => signOut()}
-      />
-    </View>
+    <Container>
+      <Header/>
+    { 
+      url ?
+      (
+        <UploadButton onPress={() => Alert.alert('clicou')}>
+          <UploadText> + </UploadText>
+
+          <Avatar
+          source={{uri: url}}
+          />
+        </UploadButton>
+      ) : 
+      (
+        <UploadButton onPress={() => Alert.alert('clicou')}>
+          <UploadText> + </UploadText>
+        </UploadButton>
+      )
+    } 
+
+    <Name>{user.name}</Name>
+    <Email>{user.email}</Email>
+
+    <Button bg="#28A745" onPress={() => setOpen(true)}>
+      <ButtonText color="#fff">Update profile</ButtonText>
+    </Button>
+
+    <Button bg="#fff" onPress={() => signOut()}>
+      <ButtonText color="#3b3b3b">Exit</ButtonText>
+    </Button>
+
+    <Modal visible={open} animationType="slide" transparent={true}>
+      <ModalContainer>
+        <ButtonBack>
+          <Feather
+            name="arrow-left"
+            size={22}
+            color="#121212"
+          />
+          <ButtonText color="#121212" onPress={() => setOpen(false)}>
+            Back
+          </ButtonText>
+        </ButtonBack>
+
+        <Input
+        placeholder={user.name}
+        value={name}
+        onChangeText={(text) => setName(text)}
+        />
+
+        <Button bg="#28A745" onPress={() => update()}>
+          {
+            loading ?
+            (
+              <ActivityIndicator size={20} color={"#fff"}/>
+            ) :
+            (
+              <ButtonText color="#fff">Update</ButtonText>
+            )
+          }
+        </Button>
+
+      </ModalContainer>
+    </Modal>
+
+    </Container>
 
   );
-
 }

@@ -83,6 +83,7 @@ export default function AuthProvider({children}) {
         })
     }
 
+
     async function storageUser(data) {
         await AsyncStorage.setItem('devapp', JSON.stringify(data))
     }    
@@ -91,7 +92,7 @@ export default function AuthProvider({children}) {
 
     return(
         <AuthContext.Provider value={{signed: !!user, user, signIn, signUp, 
-        loadingAuth, loading, signOut}}>
+        loadingAuth, loading, signOut, storageUser, setUser}}>
             {children}
         </AuthContext.Provider>
 
