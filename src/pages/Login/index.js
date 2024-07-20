@@ -2,7 +2,10 @@ import { ActivityIndicator, Alert, InputAccessoryView, Text, View } from 'react-
 import { Container, Logo, Input, Button, ButtonText, SignUpButton, SignUpText } from './styles';
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../contexts/auth';
+
 import AsyncStorage from '@react-native-community/async-storage';
+
+
 
 
 
@@ -11,7 +14,7 @@ export default function Login() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
+  
   const { signIn, signUp, loadingAuth } = useContext(AuthContext)
 
   function handleLogin() {
@@ -43,7 +46,8 @@ export default function Login() {
   if(login) {
     return(
       <Container>
-        <Logo
+        <Logo 
+        animation="fadeInUp"
         source={require('../../assets/Logo.png')}
         />
 

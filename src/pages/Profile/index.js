@@ -1,5 +1,5 @@
 import { AuthContext } from '../../contexts/auth';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { Container, Name, UploadButton, UploadText, Avatar, Button, ButtonText,
 Email, ModalContainer, ButtonBack, Input} from './styles'
@@ -7,8 +7,12 @@ Email, ModalContainer, ButtonBack, Input} from './styles'
 import Header from '../../components/Header';
 import Feather from 'react-native-vector-icons/Feather'
 import firestore from '@react-native-firebase/firestore'
+import storage from '@react-native-firebase/storage'
 
-import { ActivityIndicator, Alert, Modal } from 'react-native';
+
+import { ActivityIndicator, Alert, Modal, Platform } from 'react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Profile() {
   const { user, signOut, storageUser, setUser } = useContext(AuthContext)
@@ -17,6 +21,24 @@ export default function Profile() {
   const [url, setUrl] = useState(null)
   const [name, setName] = useState(user?.name)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    async function load () {
+      try {
+        const response = await storage().ref('users').child(user.uid)
+        .getDownloadURL();
+  
+        setUrl(response)
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    load()
+  },[])
+
+
 
   async function update () {
     setLoading(true)
@@ -57,6 +79,54 @@ export default function Profile() {
     setOpen(false)
   }
 
+  const uploadFile = () => {
+    const options = {
+      noData: true,
+      mediaType: 'photo'
+    };
+
+    launchImageLibrary(options, response => {
+      if(response.didCancel) {
+        console.log('modal canceled')
+      } else if (response.error) {
+        console.log('Error: ', response.error)
+      } else {
+
+        updateFileFirebase(response)
+        .then(() => {
+          uploadAvatarPosts()
+        })
+        setUrl(response.assets[0].uri)
+      }
+    })
+  }
+
+
+  const updateFileFirebase = async (response) => {
+    const fileSource = response.assets[0].uri;
+    const storageRef = storage().ref('users').child(user.uid)
+
+    return await storageRef.putFile(fileSource)
+  }
+
+  async function uploadAvatarPosts () {
+    const storageRef = storage().ref('users').child(user.uid);
+    const url = storageRef.getDownloadURL()
+    .then( async image => {
+      const postsDoc = await firestore().collection('posts')
+      .where('userId', '==', user.uid).get();
+
+      postsDoc.forEach( async doc => {
+        await firestore().collection('posts').doc(doc.id)
+        .update({
+          avatarUrl: image
+        })
+      })
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
 
 
   return(
@@ -65,7 +135,7 @@ export default function Profile() {
     { 
       url ?
       (
-        <UploadButton onPress={() => Alert.alert('clicou')}>
+        <UploadButton onPress={() => uploadFile()}>
           <UploadText> + </UploadText>
 
           <Avatar
@@ -74,7 +144,7 @@ export default function Profile() {
         </UploadButton>
       ) : 
       (
-        <UploadButton onPress={() => Alert.alert('clicou')}>
+        <UploadButton onPress={() => uploadFile()}>
           <UploadText> + </UploadText>
         </UploadButton>
       )

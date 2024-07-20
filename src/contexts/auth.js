@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import auth from '@react-native-firebase/auth'
 import firestore from '@react-native-firebase/firestore'
 import AsyncStorage from "@react-native-community/async-storage";
+import { Alert } from "react-native";
 
 export const AuthContext = createContext({})
 
@@ -72,6 +73,10 @@ export default function AuthProvider({children}) {
             setUser(data)
             storageUser(data)
             setLoadingAuth(false)
+        })
+        .catch((error) => {
+            setLoading(false)
+            Alert.alert('Email ou senha incorretos.')
         })
     }
 
